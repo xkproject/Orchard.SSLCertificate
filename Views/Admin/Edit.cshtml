@@ -1,0 +1,89 @@
+﻿@using Orchard.SSLCertificate.ViewModels
+@using Orchard.SSLCertificate.Settings;
+@using System.Security.Cryptography.X509Certificates
+@model SSLCertificateSettingsViewModel
+
+<h1>@RenderTitleSegments(T["SSL Certificate"])</h1>
+
+<div asp-validation-summary="ModelOnly"></div>
+<form asp-action="Edit" method="post">
+    <fieldset class="form-group" asp-validation-class-for="CertificateStoreLocation">
+        <label asp-for="CertificateStoreLocation">@T["Certificate Store Location"] <span asp-validation-for="CertificateStoreLocation"></span></label>
+        <select asp-for="CertificateStoreLocation" class="form-control">
+            @foreach (StoreLocation location in Enum.GetValues(typeof(StoreLocation)))
+            {
+                <option value="@location" selected="@(Model.CertificateStoreLocation == location)">@location.ToString()</option>
+            }
+        </select>
+        <span class="hint">@T["Select the certificate location."]</span>
+    </fieldset>
+
+    <fieldset class="form-group" asp-validation-class-for="CertificateStoreLocation">
+        <label asp-for="CertificateStoreName">@T["Certificate Store Name"] <span asp-validation-for="CertificateStoreName"></span></label>
+        <select asp-for="CertificateStoreName" class="form-control">
+            @foreach (StoreName store in Enum.GetValues(typeof(StoreName)))
+            {
+                <option value="@store" selected="@(Model.CertificateStoreName == store)">@store.ToString()</option>
+            }
+        </select>
+        <span class="hint">@T["Select the certificate store."]</span>
+    </fieldset>
+
+    <fieldset class="form-group" asp-validation-class-for="CertificateThumbPrint">
+        @if (Model.AvailableCertificates.Any())
+        {
+
+            <label asp-for="CertificateThumbPrint">@T["Certificate"] <span asp-validation-for="CertificateThumbPrint"></span></label>
+            <select asp-for="CertificateThumbPrint" class="form-control">
+                @foreach (var certificate in Model.AvailableCertificates)
+                {
+                    var selectedCertificate = Model.CertificateThumbPrint == certificate.ThumbPrint
+                                               && Model.CertificateStoreLocation.HasValue && Model.CertificateStoreLocation.Value == certificate.StoreLocation
+                                               && Model.CertificateStoreName.HasValue && Model.CertificateStoreName == certificate.StoreName;
+                    if (string.IsNullOrWhiteSpace(certificate.ThumbPrint))
+                    {
+                        <option value="" data-StoreLocation="@certificate.StoreLocation" data-StoreName="@certificate.StoreName" selected="@(selectedCertificate)"></option>
+                        continue;
+                    }
+                    var friendlyName = certificate.FriendlyName;
+                    if (string.IsNullOrWhiteSpace(friendlyName) && !string.IsNullOrWhiteSpace(certificate.ThumbPrint))
+                    {
+                        friendlyName = "No Friendly Name";
+                    }
+                    <option value="@certificate.ThumbPrint" data-StoreLocation="@certificate.StoreLocation" data-StoreName="@certificate.StoreName" selected="@(selectedCertificate)">
+                        @friendlyName [@certificate.NotBefore.ToString("dd/MM/yy") - @certificate.NotAfter.ToString("dd/MM/yy")] @certificate.Subject
+                    </option>
+                }
+            </select>
+            <span class="hint">@T["Select the certificate for signing tokens."]</span>
+        }
+        else
+        {
+            <div class="alert alert-warning" asp-validation-for="CertificateThumbPrint">@T["You need to add a certificate to your server for setting up SSL."]</div>
+        }
+    </fieldset>
+    <fieldset>
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit">@T["Save"]</button>
+            <a class="btn btn-secondary" asp-route-action="Edit">@T["Cancel"]</a>
+        </div>
+    </fieldset>
+</form>
+
+
+
+    <script at="Foot" type="text/javascript">
+        //<![CDATA[
+        $("#CertificateThumbPrint").children('option').hide();
+        $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $("#CertificateStoreLocation").val() + "][data-StoreName=" + $("#CertificateStoreName").val() + "]").show()
+
+        $("#CertificateStoreLocation").change(function () {
+            $("#CertificateThumbPrint").children('option').hide();
+            $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $(this).val() + "][data-StoreName=" + $("#CertificateStoreName").val() + "]").show()
+        })
+        $("#CertificateStoreName").change(function () {
+            $("#CertificateThumbPrint").children('option').hide();
+            $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $("#CertificateStoreLocation").val() + "][data-StoreName=" + $(this).val() + "]").show()
+        })
+        //]]>
+    </script>

@@ -1,0 +1,9 @@
+﻿Name: SSLCertificate
+AntiForgery: enabled
+Author: XKProject
+Website: http://xkproject.com
+Version: 1.0.x
+OrchardVersion: 2.0.x
+Description: SSLCertificate module allows to set the SSL certificate per tenant through config UI instead of delegating this task on the container running this task. It is specially useful when Orchard is running standalone through command line or as a windows service.
+Dependencies: Orchard.Settings
+Category: Security
