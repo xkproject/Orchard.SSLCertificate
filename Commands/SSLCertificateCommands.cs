@@ -51,26 +51,22 @@ namespace Orchard.SSLCertificate.Commands
         [OrchardSwitches("CertStoreLocation,CertStoreName,FriendlyName,SubjectName,DnsName,ExpirationDate")]
         public void ConfigureSSLCertificate()
         {
-            if (ExpirationDate == null)
-                ExpirationDate = DateTime.Now.AddYears(5);
-            if (CertStoreName != StoreName.AddressBook && CertStoreName != StoreName.AuthRoot && CertStoreName != StoreName.My)
+            if (IsValidStoreName())
+                return;
+
+            var certificate = _sslCertificateService.GetCertificate(CertStoreLocation, CertStoreName, null, FriendlyName, SubjectName, DnsName, ExpirationDate);
+            if (certificate == null)
             {
-                Context.Output.WriteLine(T["Invalid CertStoreName parameter, only [AddressBook|AuthRoot|My] are valid parameters"]);
+                Context.Output.WriteLine(T["Certificate not found"]);
                 return;
             }
+            Context.Output.WriteLine(T["Certificate with thumbprint:{0} found", certificate.Thumbprint]);
 
             var settings = new SSLCertificateSettings();
             settings.StoreLocation = CertStoreLocation;
             settings.StoreName = CertStoreName;
-
-            var certificate = _sslCertificateService.GetCertificate(settings.StoreLocation.Value,
-                settings.StoreName.Value, null, FriendlyName, SubjectName, DnsName, ExpirationDate);
-            Context.Output.WriteLine(T["Certificate with thumbprint:{0} found", settings.ThumbPrint]);
-
             settings.ThumbPrint = certificate.Thumbprint;
-            //_sslCertificateService.AddCertificateToSpecifiedStore(certificate, StoreName.Root, settings.StoreLocation.Value);
-            //Context.Output.WriteLine(T["Added Cetificate to Root Store"]);
-
+            
             _sslCertificateService.UpdateSSLCertificateSettings(settings);
             Context.Output.WriteLine(T["Updated SSL Settings with the new certificate"]);
         }
@@ -86,25 +82,34 @@ namespace Orchard.SSLCertificate.Commands
                 return;
             }
 
-            if (ExpirationDate == null)
-                ExpirationDate = DateTime.Now.AddYears(5);
-            if (CertStoreName != StoreName.AddressBook && CertStoreName != StoreName.AuthRoot && CertStoreName != StoreName.My)
+            if (IsValidStoreName())
+                return;
+
+            var certificate = _sslCertificateService.GetCertificate(CertStoreLocation, CertStoreName, null, FriendlyName, SubjectName, DnsName, ExpirationDate);
+            if (certificate == null)
             {
-                Context.Output.WriteLine(T["Invalid CertStoreName parameter, only [AddressBook|AuthRoot|My] are valid parameters"]);
+                Context.Output.WriteLine(T["Certificate not found"]);
                 return;
             }
+            Context.Output.WriteLine(T["Certificate with thumbprint:{0} found", certificate.Thumbprint]);
 
             var settings = _openIdService.GetOpenIdSettingsAsync().GetAwaiter().GetResult();
             settings.CertificateStoreLocation = CertStoreLocation;
             settings.CertificateStoreName = CertStoreName;
-            var certificate = _sslCertificateService.GetCertificate(settings.CertificateStoreLocation.Value,
-                settings.CertificateStoreName.Value, null, FriendlyName, SubjectName, DnsName, ExpirationDate);
             settings.CertificateThumbPrint = certificate.Thumbprint;
-
-            Context.Output.WriteLine(T["Certificate with thumbprint:{0} found", settings.CertificateThumbPrint]);
 
             _openIdService.UpdateOpenIdSettingsAsync(settings);
             Context.Output.WriteLine(T["Updated OpenId Connect Settings with the new certificate"]);
+        }
+
+        private bool IsValidStoreName()
+        {
+            if (CertStoreName != StoreName.AddressBook && CertStoreName != StoreName.AuthRoot && CertStoreName != StoreName.My)
+            {
+                Context.Output.WriteLine(T["Invalid CertStoreName parameter, only [AddressBook|AuthRoot|My] are valid parameters"]);
+                return false;
+            }
+            return true;
         }
     }
 }

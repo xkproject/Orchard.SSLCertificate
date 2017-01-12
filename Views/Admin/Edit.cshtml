@@ -70,20 +70,18 @@
     </fieldset>
 </form>
 
+<script at="Foot" type="text/javascript">
+    //<![CDATA[
+    $("#CertificateThumbPrint").children('option').hide();
+    $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $("#CertificateStoreLocation").val() + "][data-StoreName=" + $("#CertificateStoreName").val() + "]").show()
 
-
-    <script at="Foot" type="text/javascript">
-        //<![CDATA[
+    $("#CertificateStoreLocation").change(function () {
         $("#CertificateThumbPrint").children('option').hide();
-        $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $("#CertificateStoreLocation").val() + "][data-StoreName=" + $("#CertificateStoreName").val() + "]").show()
-
-        $("#CertificateStoreLocation").change(function () {
-            $("#CertificateThumbPrint").children('option').hide();
-            $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $(this).val() + "][data-StoreName=" + $("#CertificateStoreName").val() + "]").show()
-        })
-        $("#CertificateStoreName").change(function () {
-            $("#CertificateThumbPrint").children('option').hide();
-            $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $("#CertificateStoreLocation").val() + "][data-StoreName=" + $(this).val() + "]").show()
-        })
-        //]]>
-    </script>
+        $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $(this).val() + "][data-StoreName=" + $("#CertificateStoreName").val() + "]").show()
+    })
+    $("#CertificateStoreName").change(function () {
+        $("#CertificateThumbPrint").children('option').hide();
+        $("#CertificateThumbPrint").children("option[data-StoreLocation=" + $("#CertificateStoreLocation").val() + "][data-StoreName=" + $(this).val() + "]").show()
+    })
+    //]]>
+</script>

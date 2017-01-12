@@ -12,8 +12,8 @@ namespace Orchard.SSLCertificate.Services
     public interface ISSLCertificateService
     {
         SSLCertificateSettings GetSSLCertificateSettings();
-        void UpdateSSLCertificateSettings(SSLCertificateSettings SSLCertificateSettings);
-        bool IsValidSSLCertificateSettings(SSLCertificateSettings SSLCertificateSettings);
+        void UpdateSSLCertificateSettings(SSLCertificateSettings settings);
+        bool IsValidSSLCertificateSettings(SSLCertificateSettings settings);
         bool IsValidSSLCertificateSettings(SSLCertificateSettings settings, ModelStateDictionary modelState);
         IEnumerable<CertificateInfo> GetAvailableCertificates(bool onlyCertsWithPrivateKey);
         CertificateInfo GetCertificateInfo(StoreLocation storeLocation, StoreName storeName, string certThumbPrint);

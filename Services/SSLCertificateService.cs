@@ -61,9 +61,9 @@ namespace Orchard.SSLCertificate.Services
             return sslCertificateSettings;
         }
 
-        public void UpdateSSLCertificateSettings(SSLCertificateSettings sslCertificateSettings)
+        public void UpdateSSLCertificateSettings(SSLCertificateSettings settings)
         {
-            File.WriteAllText("sslsettings.json", JsonConvert.SerializeObject(sslCertificateSettings));
+            File.WriteAllText("sslsettings.json", JsonConvert.SerializeObject(settings));
         }
 
         public bool IsValidSSLCertificateSettings(SSLCertificateSettings settings, ModelStateDictionary modelState)
@@ -136,8 +136,8 @@ namespace Orchard.SSLCertificate.Services
 
                         x509Store.Open(OpenFlags.ReadOnly);
 
-                        X509Certificate2Collection col = x509Store.Certificates;
-                        foreach (var cert in col)
+                        X509Certificate2Collection certificates = x509Store.Certificates;
+                        foreach (var cert in certificates)
                         {
                             if (!cert.Archived && (!onlyCertsWithPrivateKey || (onlyCertsWithPrivateKey && cert.HasPrivateKey)))
                             {
@@ -191,25 +191,29 @@ namespace Orchard.SSLCertificate.Services
             {
                 x509Store.Open(OpenFlags.ReadOnly);
 
-                X509Certificate2Collection col = x509Store.Certificates;
-                foreach (var cert in col)
+                X509Certificate2Collection certificates = x509Store.Certificates;
+                foreach (var cert in certificates)
                 {
-                    if ((certThumbPrint==null || string.Compare(cert.Thumbprint, certThumbPrint) == 0)
-                        &&
-                        (friendlyName == null || string.Compare(cert.FriendlyName, friendlyName) == 0)
-                        &&
-                        (certSubjectName == null || string.Compare(cert.SubjectName.Name,"CN="+certSubjectName) == 0)
-                        &&
-                        (dnsName == null || string.Compare(cert.GetNameInfo(X509NameType.DnsName,false), dnsName) == 0)
-                        &&
-                        (notAfter == null || !notAfter.HasValue || cert.NotAfter.Date == notAfter.Value.Date)
-                        )
+                    if (IsCertificateMatchingNotNullParameters(certThumbPrint, friendlyName, certSubjectName, dnsName, notAfter, cert))
                     {
                         return cert;
                     }
                 }
             }
             return null;
+        }
+
+        private bool IsCertificateMatchingNotNullParameters(string certThumbPrint, string friendlyName, string certSubjectName, string dnsName, DateTime? notAfter, X509Certificate2 cert)
+        {
+            return (certThumbPrint == null || string.Compare(cert.Thumbprint, certThumbPrint) == 0)
+                                    &&
+                                    (friendlyName == null || string.Compare(cert.FriendlyName, friendlyName) == 0)
+                                    &&
+                                    (certSubjectName == null || string.Compare(cert.SubjectName.Name, "CN=" + certSubjectName) == 0)
+                                    &&
+                                    (dnsName == null || string.Compare(cert.GetNameInfo(X509NameType.DnsName, false), dnsName) == 0)
+                                    &&
+                                    (notAfter == null || !notAfter.HasValue || cert.NotAfter.Date == notAfter.Value.Date);
         }
     }
 }

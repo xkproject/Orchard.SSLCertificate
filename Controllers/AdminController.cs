@@ -29,7 +29,7 @@ namespace Orchard.SSLCertificate.Controllers
             _shellSettings = shellSettings;
         }
         
-        public async Task<IActionResult> Edit(string returnUrl = null)
+        public async Task<IActionResult> Edit(string returnUrl)
         {
             if (_shellSettings.Name!= "Default" 
                 || !await _authorizationService.AuthorizeAsync(User, Permissions.ManageSettings))
@@ -48,7 +48,7 @@ namespace Orchard.SSLCertificate.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(SSLCertificateSettingsViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Edit(SSLCertificateSettingsViewModel model, string returnUrl)
         {
             if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageSettings))
                 return Unauthorized();
@@ -60,16 +60,28 @@ namespace Orchard.SSLCertificate.Controllers
             
             _sslCertificateService.IsValidSSLCertificateSettings(settings, ModelState);
 
-            ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
                 _sslCertificateService.UpdateSSLCertificateSettings(settings);
-                model.CertificateThumbPrint = settings.ThumbPrint;
+                return RedirectToLocal(returnUrl);
             }
-            model.AvailableCertificates = _sslCertificateService.GetAvailableCertificates(onlyCertsWithPrivateKey: false);
 
-            // If we got this far, something failed, redisplay form
+            model.AvailableCertificates = _sslCertificateService.GetAvailableCertificates(onlyCertsWithPrivateKey: false);
+            ViewData["ReturnUrl"] = returnUrl;
             return View(model);
         }
+
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                return Redirect("~/");
+            }
+        }
+
     }
 }
