@@ -51,7 +51,7 @@ namespace Orchard.SSLCertificate.Commands
         [OrchardSwitches("CertStoreLocation,CertStoreName,FriendlyName,SubjectName,DnsName,ExpirationDate")]
         public void ConfigureSSLCertificate()
         {
-            if (IsValidStoreName())
+            if (!IsValidStoreName())
                 return;
 
             var certificate = _sslCertificateService.GetCertificate(CertStoreLocation, CertStoreName, null, FriendlyName, SubjectName, DnsName, ExpirationDate);
@@ -82,7 +82,7 @@ namespace Orchard.SSLCertificate.Commands
                 return;
             }
 
-            if (IsValidStoreName())
+            if (!IsValidStoreName())
                 return;
 
             var certificate = _sslCertificateService.GetCertificate(CertStoreLocation, CertStoreName, null, FriendlyName, SubjectName, DnsName, ExpirationDate);
