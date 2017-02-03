@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
@@ -187,6 +188,7 @@ namespace Orchard.SSLCertificate.Services
 
         public X509Certificate2 GetCertificate(StoreLocation storeLocation, StoreName storeName, string certThumbPrint,  string friendlyName, string certSubjectName, string dnsName, Nullable<DateTime> notAfter)
         {
+            var result = new List<X509Certificate2>();
             using (X509Store x509Store = new X509Store(storeName, storeLocation))
             {
                 x509Store.Open(OpenFlags.ReadOnly);
@@ -196,11 +198,13 @@ namespace Orchard.SSLCertificate.Services
                 {
                     if (IsCertificateMatchingNotNullParameters(certThumbPrint, friendlyName, certSubjectName, dnsName, notAfter, cert))
                     {
-                        return cert;
+                        result.Add(cert);
                     }
                 }
             }
-            return null;
+            if (!result.Any())
+                return null;
+            return result.OrderByDescending(cert=>cert.NotAfter).FirstOrDefault();
         }
 
         private bool IsCertificateMatchingNotNullParameters(string certThumbPrint, string friendlyName, string certSubjectName, string dnsName, DateTime? notAfter, X509Certificate2 cert)

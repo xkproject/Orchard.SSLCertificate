@@ -54,7 +54,11 @@ namespace Orchard.SSLCertificate.Commands
             if (!IsValidStoreName())
                 return;
 
-            var certificate = _sslCertificateService.GetCertificate(CertStoreLocation, CertStoreName, null, FriendlyName, SubjectName, DnsName, ExpirationDate);
+            DateTime? expiration = null;
+            if (ExpirationDate != default(DateTime))
+                expiration = ExpirationDate;
+
+            var certificate = _sslCertificateService.GetCertificate(CertStoreLocation, CertStoreName, null, FriendlyName, SubjectName, DnsName, expiration);
             if (certificate == null)
             {
                 Context.Output.WriteLine(T["Certificate not found"]);
@@ -85,7 +89,11 @@ namespace Orchard.SSLCertificate.Commands
             if (!IsValidStoreName())
                 return;
 
-            var certificate = _sslCertificateService.GetCertificate(CertStoreLocation, CertStoreName, null, FriendlyName, SubjectName, DnsName, ExpirationDate);
+            DateTime? expiration = null;
+            if (ExpirationDate != default(DateTime))
+                expiration = ExpirationDate;
+
+            var certificate = _sslCertificateService.GetCertificate(CertStoreLocation, CertStoreName, null, FriendlyName, SubjectName, DnsName, expiration);
             if (certificate == null)
             {
                 Context.Output.WriteLine(T["Certificate not found"]);
