@@ -11,6 +11,7 @@ using Orchard.Settings.Services;
 using Orchard.SSLCertificate.Services;
 using Orchard.SSLCertificate.Commands;
 using Orchard.Environment.Commands;
+using Microsoft.AspNetCore.Modules;
 
 namespace Orchard.SSLCertificate
 {
