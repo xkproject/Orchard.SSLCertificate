@@ -9,6 +9,9 @@
     <PackageId>Orchard.SSLCertificate</PackageId>
     <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;portable-net451+win8</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,9 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OrchardCore\Orchard.Environment.Commands\Orchard.Environment.Commands.csproj" />
-    <ProjectReference Include="..\..\Modules\Orchard.OpenId\Orchard.OpenId.csproj" />
-    <ProjectReference Include="..\..\Modules\Orchard.Settings\Orchard.Settings.csproj" />
+    <ProjectReference Include="..\..\OrchardCore.Modules\Orchard.OpenId\Orchard.OpenId.csproj" />
+    <ProjectReference Include="..\..\OrchardCore.Modules\Orchard.Settings\Orchard.Settings.csproj" />
   </ItemGroup>
 
 </Project>
